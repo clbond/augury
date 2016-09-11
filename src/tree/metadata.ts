@@ -47,11 +47,11 @@ const getPropertyMetadata =
       case functionName(AsyncSubject):
       case functionName(BehaviorSubject):
       case functionName(ReplaySubject):
-      case functionName(Subscriber):
       case functionName(Subject):
         flags |= PropertyMetadata.Subject | PropertyMetadata.Observable;
         break;
       case functionName(Observable):
+      case functionName(Subscriber):
         flags |= PropertyMetadata.Observable;
         break;
       default:
