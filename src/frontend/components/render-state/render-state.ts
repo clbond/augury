@@ -101,11 +101,7 @@ export class RenderState {
       return `Array[${object.length}]`;
     }
     else if (object != null) {
-      const flags = this.metadataForKey(key);
-      if (flags & PropertyMetadata.Subject) {
-        return 'Subject';
-      }
-      else if (flags & PropertyMetadata.Observable) {
+      if ((this.metadataForKey(key) & PropertyMetadata.Observable) !== 0) {
         return 'Observable';
       }
       else if (Object.keys(object).length === 0) {

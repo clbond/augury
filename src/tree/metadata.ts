@@ -31,7 +31,33 @@ export interface InstanceValue {
   metadata: any | Metadata;
 }
 
-const getPropertyMetadata =
+export const instanceWithMetadata =
+    (instance, inputs: Set<string>, outputs: Set<string>): InstanceValue => {
+  const map = new Map<any, PropertyMetadata>();
+
+  if (instance != null) {
+    for (const key of Object.keys(instance)) {
+      loadMetadata(inputs, outputs, instance[key], key, map);
+    }
+  }
+
+  const metadataArray = new Array<any>();
+
+  map.forEach(
+    (value, key) => {
+      if (value !== 0) { // zero is not worth serializing and sending to UI
+        metadataArray.push([key, value]);
+      }
+    });
+
+  // It is very important that both the instance and metadata objects are part
+  // of the same object so that they get serialized together in {@link serialize}.
+  // This is because both instance and metadata refer to the same object instances,
+  // so they must be serialized together for those references to remain intact.
+  return {instance, metadata: metadataArray};
+};
+
+const loadMetadata =
     (inputs: Set<string>, outputs: Set<string>, instance, top: string, map: Metadata) => {
   if (map.has(instance)) {
     return;
@@ -61,7 +87,7 @@ const getPropertyMetadata =
           map.set(instance, flags);
 
           if (map.has(value) === false) {
-            getPropertyMetadata(inputs, outputs, value, null, map);
+            loadMetadata(inputs, outputs, value, null, map);
           }
         }
         break;
@@ -78,34 +104,6 @@ const getPropertyMetadata =
   }
 
   map.set(instance, flags);
-};
-
-export const getInstanceValue =
-    (instance, inputs: Set<string>, outputs: Set<string>): InstanceValue => {
-  const map = new Map<any, PropertyMetadata>();
-
-  if (instance != null) {
-    for (const key of Object.keys(instance)) {
-      const value = instance[key];
-      getPropertyMetadata(inputs, outputs, value, key, map);
-    }
-  }
-
-  const reconstructedMap = new Array<any>();
-
-  let iterator = map.entries();
-  do {
-    const result = iterator.next();
-    if (result.done) {
-      break;
-    }
-    if (result.value[1] !== 0) {
-      reconstructedMap.push([result.value[0], result.value[1]]);
-    }
-  }
-  while (true);
-
-  return {instance, metadata: reconstructedMap};
 };
 
 const isScalar = value => {

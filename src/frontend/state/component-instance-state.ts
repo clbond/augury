@@ -82,6 +82,7 @@ export class ComponentInstanceState {
     })
     .catch(error => {
       this.map.set(node.id, new LookupError(error));
+
       this.changeDetector.detectChanges();
     });
   }

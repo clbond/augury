@@ -7,7 +7,7 @@ import {
   MutableTree,
   Node,
   Path,
-  getInstanceValue,
+  instanceWithMetadata,
   serializePath,
 } from '../tree';
 
@@ -180,11 +180,10 @@ const getComponentInstance = (tree: MutableTree, node: Node) => {
   if (node) {
     const probed = ng.probe(node.nativeElement());
     if (probed) {
-      const inputs = new Set<string>(node.input.map(binding => binding.replace(/:(.*)$/, '')));
-
-      const outputs = new Set<string>(node.output);
-
-      return getInstanceValue(probed.componentInstance, inputs, outputs);
+      return instanceWithMetadata(
+        probed.componentInstance,
+        new Set<string>(node.input.map(binding => binding.replace(/:(.*)$/, ''))),
+        new Set<string>(node.output));
     }
   }
   return null;
