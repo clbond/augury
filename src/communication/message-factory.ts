@@ -48,6 +48,12 @@ export abstract class MessageFactory {
     });
   }
 
+  static ping(): Message<void> {
+    return create({
+      messageType: MessageType.Ping,
+    });
+  }
+
   static push(): Message<void> {
     return create({
       messageType: MessageType.Push,
